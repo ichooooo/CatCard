@@ -1,0 +1,186 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Interactive Card</title>
+    
+
+    <style>
+      body {
+        margin: 0;
+        display: grid;
+        place-items: center;
+        height: 100vh;
+        background: #f6f6f6;
+      }
+
+      .card-wrap {
+        position: relative;
+        width: min(620px, 95vw);
+        height: min(860px, 95vh);
+        border-radius: 24px;
+        overflow: hidden;
+        box-shadow: 0 12px 40px rgba(0,0,0,0.15);
+        background: white;
+      }
+
+      canvas {
+        width: 100%;
+        height: 100%;
+        display: block;
+      }
+
+  
+      .overlay {
+        position: absolute;
+        inset: 0;
+        pointer-events: none; 
+      }
+
+      .message {
+        position: absolute;
+        left: 30%;
+        bottom: 62%;
+        transform: translateX(-50%);
+        width: auto;
+        padding: 16px 18px;
+        border-radius: 18px;
+        
+        font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+        text-align: center;
+        font-size: 30px;
+        font-weight: 700;
+
+        opacity: 0;
+        transition: opacity 250ms ease;
+      }
+
+      .message.show {
+        opacity: 1;
+      }
+
+    
+      #confetti {
+        position: absolute;
+        inset: 0;
+        opacity: 0;
+        transition: opacity 200ms ease;
+      }
+
+      #confetti.show {
+        opacity: 1;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="card-wrap">
+     
+      <canvas id="riveCanvas"></canvas>
+
+
+      <div class="overlay">
+   
+        <div id="confetti"></div>
+
+      
+        <div id="message" class="message">Happy Birthday!</div>
+
+       
+      </div>
+    </div>
+
+   
+    <script src="https://unpkg.com/@rive-app/canvas@2.23.0"></script>
+
+    
+    <script src="https://unpkg.com/lottie-web@5.12.2/build/player/lottie.min.js"></script>
+
+    <script>
+      const MESSAGE_DELAY_MS = 1500;
+      const CONFETTI_DELAY_MS = 1900;
+      let messageTimeoutId = null;
+      let confettiTimeoutId = null;
+
+      
+      const confettiAnim = lottie.loadAnimation({
+        container: document.getElementById("confetti"),
+        renderer: "svg",
+        loop: false,
+        autoplay: false,
+        path: "confetti.json" 
+      });
+
+      const messageEl = document.getElementById("message");
+      const confettiEl = document.getElementById("confetti");
+
+      function showInsideUI() {
+        clearTimeout(messageTimeoutId);
+        clearTimeout(confettiTimeoutId);
+        
+        messageTimeoutId = setTimeout(() => {
+          messageEl.classList.add("show");
+        }, MESSAGE_DELAY_MS);
+        
+        confettiTimeoutId = setTimeout(() => {
+          confettiEl.classList.add("show");
+          confettiAnim.goToAndPlay(0, true);
+        }, CONFETTI_DELAY_MS);
+      }
+
+      function hideInsideUI() {
+        
+        clearTimeout(messageTimeoutId);
+        clearTimeout(confettiTimeoutId);
+
+        
+        messageEl.classList.remove("show");
+        confettiEl.classList.remove("show");
+        confettiAnim.stop();
+      }
+
+      
+      const riveInstance = new rive.Rive({
+        src: "cat_tree.riv", 
+        canvas: document.getElementById("riveCanvas"),
+        stateMachines: "State Machine 1", 
+        autoplay: true,
+        onLoad: () => {
+          riveInstance.resizeDrawingSurfaceToCanvas();
+
+          
+          const inputs = riveInstance.stateMachineInputs("State Machine 1");
+          const isInsideInput = inputs.find(i => i.name === "zoomedin");
+
+          if (!isInsideInput) {
+            console.warn("No input called 'zoomedin' found in Rive.");
+            return;
+          }
+
+          
+          let lastInside = false;
+
+          function tick() {
+            const nowInside = !!isInsideInput.value;
+
+            if (nowInside !== lastInside) {
+              lastInside = nowInside;
+              if (nowInside) showInsideUI();
+              else hideInsideUI();
+            }
+
+            requestAnimationFrame(tick);
+          }
+
+          tick();
+        }
+      });
+
+      
+      window.addEventListener("resize", () => {
+        riveInstance.resizeDrawingSurfaceToCanvas();
+      });
+    </script>
+  </body>
+</html>
