@@ -103,6 +103,17 @@
       let messageTimeoutId = null;
       let confettiTimeoutId = null;
 
+      function getRiveSource() {
+        const isCoarsePointer = window.matchMedia("(pointer: coarse)").matches;
+        const isSmallScreen = window.matchMedia("(max-width: 768px)").matches;
+
+        return (isCoarsePointer || isSmallScreen)
+          ? "cat_tree_mobile.riv"
+          : "cat_tree.riv";
+      }
+
+
+
       
       const confettiAnim = lottie.loadAnimation({
         container: document.getElementById("confetti"),
@@ -142,7 +153,7 @@
 
       
       const riveInstance = new rive.Rive({
-        src: "cat_tree.riv", 
+        src: getRiveSource(),
         canvas: document.getElementById("riveCanvas"),
         stateMachines: "State Machine 1", 
         autoplay: true,
