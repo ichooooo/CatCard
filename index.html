@@ -36,6 +36,7 @@
         position: absolute;
         inset: 0;
         pointer-events: none; 
+        z-index: 10;
       }
 
       .message {
@@ -96,6 +97,7 @@
 
         white-space: nowrap;
         pointer-events: none;
+        z-index: 20;
 
         opacity: 0;
         transition: opacity 300ms ease, transform 300ms ease;
@@ -224,7 +226,7 @@
 
               if (nowInside) {
                 showInsideUI();
-                hintEl.classList.remove("show"); // ✅ hide hint after interaction
+                hintEl.classList.remove("show"); 
               } else {
                 hideInsideUI();
               }
