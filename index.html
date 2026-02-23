@@ -107,6 +107,23 @@
         opacity: 1;
         transform: translate(-50%, -50%) scale(1.05);
       }
+
+
+      @media (max-width: 768px), (pointer: coarse) {
+        body {
+          display: block;      
+          height: 100dvh;     
+          background: white;   
+        }
+
+        .card-wrap {
+          width: 100vw;
+          height: 100dvh;
+          border-radius: 0;    
+          box-shadow: none;    
+        }
+      }
+      
     </style>
   </head>
 
